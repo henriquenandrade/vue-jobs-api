@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,73 +12,54 @@ class CompanyController extends BaseController
 {
     public function index()
     {
-        $companies = Company::with('vacancies')->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Companies retrieved successfully',
-            'data' => $companies
-        ], 200);
+        $companies = Company::all();
+        return $this->sendResponse(CompanyResource::collection($companies), 'Companies retrieved successfully');
     }
 
     public function show($id)
     {
-        $company = Company::with('vacancies')->findOrFail($id);
-        return response()->json([
-            'status' => true,
-            'message' => 'Company retrieved successfully',
-            'data' => $company
-        ], 200);
+        $company = Company::findOrFail($id);
+        
+        if (is_null($company)) {
+            return $this->sendError('Company not found.');
+        }
+
+        return $this->sendResponse(new CompanyResource($company), 'Company retrieved successfully');
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|unique',
+            'email' => 'required|unique:companies|string|max:255',
         ]);
 
         if($validator->fails())
         {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->sendError('Validation Error.', $validator->errors());
         }
 
         $company = Company::create($request->all());
         
-        return response()->json([
-            'status' => true,
-            'message' => 'Company created successfully',
-            'data' => $company
-        ], 201);
+        return $this->sendResponse(new CompanyResource($company), 'Company created successfully');
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|unique',
+            'email' => 'required|unique:companies|string|max:255',
         ]);
 
         if($validator->fails())
         {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+            $this->sendError('Validation Error.', $validator->errors());
         }
 
         $company = Company::findOrFail($id);
         $company->update($request->all());
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Company updated successfully',
-            'data' => $company
-        ], 201);
+        return $this->sendResponse(new CompanyResource($company), 'Company updated seccessfully');
     }
 
     public function destroy($id)
@@ -85,9 +67,6 @@ class CompanyController extends BaseController
         $company = Company::findOrFail($id);
         $company->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Company deleted successfully'
-        ], 204);
+        return $this->sendResponse([], 'Company deleted successfully');
     }
 }
