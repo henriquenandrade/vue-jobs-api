@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\CompanyController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\VacancyController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -16,4 +16,5 @@ Route::controller(RegisterController::class)->group(function(){
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::resource('jobs', VacancyController::class);
+    Route::resource('companies', CompanyController::class);
 });
