@@ -24,6 +24,11 @@ class Vacancy extends Model
         'company_id',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class);
