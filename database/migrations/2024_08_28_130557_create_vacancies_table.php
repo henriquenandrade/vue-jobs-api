@@ -18,7 +18,10 @@ return new class extends Migration
             $table->text('description');
             $table->string('location');
             $table->float('salary');
-            $table->foreignId('company_id')->constrained();
+            $table->foreignId('company_id')
+                ->constrained('companies')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
