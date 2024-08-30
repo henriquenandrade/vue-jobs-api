@@ -69,6 +69,12 @@ class VacancyController extends BaseController
 
         $vacancy = Vacancy::findOrFail($id);
         $vacancy->update($request->all());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Vacancy updated successfully',
+            'data' => $vacancy
+        ], 201);
     }
 
     public function destroy($id)
