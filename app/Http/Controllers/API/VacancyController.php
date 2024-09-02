@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Resources\VacancyResource;
 use App\Models\Vacancy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,21 +13,17 @@ class VacancyController extends BaseController
     public function index()
     {
         $vacancies = Vacancy::with('company')->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Jobs retrieved successfully',
-            'data' => $vacancies
-        ], 200);
+        return $this->sendResponse(VacancyResource::collection($vacancies), 'Vacancies retrieved successfully');
     }
 
     public function show($id)
     {
         $vacancy = Vacancy::with('company')->findOrFail($id);
-        return response()->json([
-            'status' => true,
-            'message' => 'Job retrieved successfully',
-            'data' => $vacancy
-        ], 200);
+        if (is_null($vacancy)) {
+            return $this->sendError('Vacancy not found.');
+        }
+
+        return $this->sendResponse(new VacancyResource($vacancy), 'Vacancy retrieved successfully');
     }
 
     public function store(Request $request)
@@ -37,19 +34,14 @@ class VacancyController extends BaseController
         
         if($validator->fails())
         {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+            if($validator->fails())
+            {
+                $this->sendError('Validation Error.', $validator->errors());
+            }
         }
 
         $vacancy = Vacancy::create($request->all());
-        return response()->json([
-            'status' => true,
-            'message' => 'Job created successfully',
-            'data' => $vacancy
-        ], 201);
+        return $this->sendResponse(new VacancyResource($vacancy), 'Vacancy created successfully');
     }
 
     public function update(Request $request, $id)
@@ -60,21 +52,16 @@ class VacancyController extends BaseController
         
         if($validator->fails())
         {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+            if($validator->fails())
+            {
+                $this->sendError('Validation Error.', $validator->errors());
+            }
         }
 
         $vacancy = Vacancy::findOrFail($id);
         $vacancy->update($request->all());
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Vacancy updated successfully',
-            'data' => $vacancy
-        ], 201);
+        return $this->sendResponse(new VacancyResource($vacancy), 'Vacancy updated seccessfully');
     }
 
     public function destroy($id)
@@ -82,9 +69,6 @@ class VacancyController extends BaseController
         $vacancy = Vacancy::findOrFail($id);
         $vacancy->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Job deleted successfully'
-        ], 204);
+        return $this->sendResponse([], 'Vacancy deleted successfully');
     }
 }
