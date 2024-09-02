@@ -12,13 +12,13 @@ class VacancyController extends BaseController
 {
     public function index()
     {
-        $vacancies = Vacancy::with('company')->get();
+        $vacancies = Vacancy::all();
         return $this->sendResponse(VacancyResource::collection($vacancies), 'Vacancies retrieved successfully');
     }
 
     public function show($id)
     {
-        $vacancy = Vacancy::with('company')->findOrFail($id);
+        $vacancy = Vacancy::findOrFail($id);
         if (is_null($vacancy)) {
             return $this->sendError('Vacancy not found.');
         }
