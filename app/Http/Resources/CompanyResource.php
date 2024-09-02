@@ -21,8 +21,8 @@ class CompanyResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'vacancies' => VacancyResource::collection($this->vacancies),
-            'created_at' => $this->created_at->format('d/m/Y'),
-            'updated_at' => $this->updated_at->format('d/m/Y'),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
