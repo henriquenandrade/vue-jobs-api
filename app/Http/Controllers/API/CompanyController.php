@@ -13,10 +13,7 @@ class CompanyController extends BaseController
     public function index()
     {
         $companies = Company::paginate(10);
-        return $this->sendResponse(CompanyResource::collection($companies)
-            ->response()
-            ->getData(true),
-            'Companies retrieved successfully');
+        return CompanyResource::collection($companies)->response();
     }
 
     public function show($id)

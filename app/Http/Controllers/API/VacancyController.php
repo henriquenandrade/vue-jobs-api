@@ -13,10 +13,7 @@ class VacancyController extends BaseController
     public function index()
     {
         $vacancies = Vacancy::paginate(10);
-        return $this->sendResponse(VacancyResource::collection($vacancies)
-            ->response()
-            ->getData(true),
-            'Vacancies retrieved successfully');
+        return VacancyResource::collection($vacancies)->response();
     }
 
     public function show($id)
